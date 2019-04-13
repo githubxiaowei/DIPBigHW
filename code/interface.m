@@ -22,7 +22,7 @@ function varargout = interface(varargin)
 
 % Edit the above text to modify the response to help interface
 
-% Last Modified by GUIDE v2.5 13-Apr-2019 20:17:05
+% Last Modified by GUIDE v2.5 13-Apr-2019 22:29:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -278,4 +278,3 @@ else
     end
     set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
 end
-
