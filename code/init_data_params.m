@@ -1,12 +1,16 @@
-function init_params()
+function init_data_params()
 %load_data 初始化全局变量
 %   初始化全局变量：g_bird_data：结构体
 %   属性：
-%   classes_num：整数类型 鸟类种数 
-%   classes：cell类型     种类名称列表
-%   data_dir：字符串类型  数据解压后的文件夹
-%   img_path：cell类型    所有图片的路径
-%   img_num: 整数类型     图片总数
+%   classes_num：整数类型    鸟类种数 
+%   classes：cell类型        种类名称列表
+%   data_dir：字符串类型     数据解压后的文件夹
+%   feature_dir：字符串类型  数据集特征的文件夹
+%   img_path：cell类型       所有图片的路径
+%   img_num: 整数类型        图片总数
+%   start_idx：数组类型      每一类图片的起始索引
+%   train_set：逻辑数组      训练集的索引
+
     global g_bird_data;
 
     %类型数目
@@ -34,12 +38,19 @@ function init_params()
         temp = str2num(temp(1).char);
         if current_class ~= temp
             current_class = temp;
-            g_bird_data.start_idx(current_class) = idx;
+            g_bird_data.start_idx(current_class) = idx;%每个类别在 img_paths 中的起始位置
         end
         idx = idx+1;
     end
     
-    %每个类别在 img_paths 中的起始位置
- 
+    %训练集的索引
+    %g_bird_data.img_paths(g_bird_data.train_set)返回训练集
+    %g_bird_data.img_paths(~g_bird_data.train_set)返回测试集
+    d = importdata([g_bird_data.data_dir,'/CUB_200_2011/train_test_split.txt']);
+    g_bird_data.train_set = logical(d(:,2));
+    
+    %数据集特征，由 prepare_feature.m 生成特征文件
+    g_bird_data.features.dir = '../features';
+    g_bird_data.features.RGBhist = [g_bird_data.features.dir,'/feat_RGBhist.mat'];
 
 end

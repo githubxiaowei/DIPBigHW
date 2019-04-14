@@ -63,14 +63,7 @@ guidata(hObject, handles);
 % %     plot(rand(5));
 % % end
 init_data_params(); %初始化数据库
-global g_state; %定义全局变量
-g_state.img = nan; %用户上传的图片
-g_state.curr_page = 0; %当前页面
-g_state.total_page_num = 0; %页面总数
-g_state.img_per_page = 8; %每页8张图片
-g_state.img_list = {}; %检索结果
-
-
+init_state_params(); %初始化程序状态
 
 % UIWAIT makes interface wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -91,26 +84,15 @@ function showbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to showbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
-             handles.axes5,handles.axes6,handles.axes7,handles.axes8];
 
 bird_class = get(handles.popupmenu1, 'Value');
 global g_bird_data;
-I = g_bird_data.img_paths([g_bird_data.start_idx(bird_class):g_bird_data.start_idx(bird_class+1)-1]);
 global g_state;
-g_state.img_list = I;
+g_state.img_list = g_bird_data.img_paths([g_bird_data.start_idx(bird_class):g_bird_data.start_idx(bird_class+1)-1]);
+g_state.task = 0; %当前状态为浏览数据库
 g_state.curr_page = 1;
-g_state.total_page_num = ceil(length(I)/g_state.img_per_page);
-for i = 1:8
-    axes(axes_list(i));
-    cla;title(''); % 删除标题
-    if(i>length(I))
-        continue;
-    end
-    imshow(imread(string(I(i)).char));
-    title(num2str(i));
-end
-set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
+g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
+refresh_axes(handles);
 
 
 % --------------------------------------------------------------------
@@ -201,27 +183,15 @@ function searchbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global g_state;
+
 if isnan(g_state.img)
     errordlg('您还没有选取图片！！','温馨提示');%如果没有输入，则创建错误对话框
 else
-    axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
-             handles.axes5,handles.axes6,handles.axes7,handles.axes8];
-    
-    %TODO: return images similar with g_state.img
-    I = retrieve_top50();
-    g_state.img_list = I;
-    g_state.total_page_num = ceil(length(I)/g_state.img_per_page);
+    g_state.task = 1; %当前状态为检索图片
+    g_state.img_list = retrieve_top50(0);
+    g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
     g_state.curr_page = min(1,g_state.total_page_num);
-    for i = 1:8
-        axes(axes_list(i));
-        cla;title(''); % 删除标题
-        if(i>length(I))
-            continue;
-        end
-        imshow(imread(string(I(i)).char));
-        title(num2str(i));
-    end
-    set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
+    refresh_axes(handles);
          
 end
 
@@ -236,19 +206,8 @@ global g_state;
 if g_state.curr_page <= 1
     return;
 else
-    axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
-             handles.axes5,handles.axes6,handles.axes7,handles.axes8];
-    global g_state;
-    I = g_state.img_list;
     g_state.curr_page = g_state.curr_page-1;
-    for i = 1:8
-        axes(axes_list(i));
-        cla;title(''); % 删除标题
-        idx = (g_state.curr_page-1)*g_state.img_per_page+i;
-        imshow(imread(string(I(idx)).char));
-        title(num2str(idx));
-    end
-    set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
+    refresh_axes(handles);
 end
 
 
@@ -261,20 +220,37 @@ global g_state;
 if g_state.curr_page >= g_state.total_page_num
     return;
 else
-    axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
-             handles.axes5,handles.axes6,handles.axes7,handles.axes8];
-    global g_state;
-    I = g_state.img_list;
     g_state.curr_page = g_state.curr_page+1;
-    for i = 1:8
-        axes(axes_list(i));
-        cla;title(''); % 删除标题
-        idx = (g_state.curr_page-1)*g_state.img_per_page+i;
-        if(idx>length(I))
-            continue;
-        end
-        imshow(imread(string(I(idx)).char));
+    refresh_axes(handles);
+end
+
+%
+function [class_str] = extract_class(path)
+%extract_class 从图片路径解析出图片类型
+pieces = split(path,'/');
+p = split(pieces(end-1),'.');
+class_str = p(1);
+
+%display imgs on 8 axes
+function refresh_axes(handles)
+axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
+         handles.axes5,handles.axes6,handles.axes7,handles.axes8];
+global g_state;
+I = g_state.img_list;
+for i = 1:8
+    axes(axes_list(i));
+    cla;title(''); % 删除标题
+    idx = (g_state.curr_page-1)*g_state.img_per_page+i;
+    if(idx>length(I))
+        continue;
+    end
+    imshow(imread(I{idx}));
+    if g_state.task == 1
+        title(strcat('class:',extract_class(I{idx})));
+    else
         title(num2str(idx));
     end
-    set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
 end
+set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
+
+
