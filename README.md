@@ -19,26 +19,40 @@ git clone https://github.com/githubxiaowei/DIPBigHW.git
 ![show](md_img/ui2.png)
 
 ### TODO
-在 code/interface.m 的如下函数为“检索图片”按钮的回调函数，大概在200行左右。
-
-需要把检索得到的图片集合返回给下方倒数第3行的 I，而不是给它空集。
+在 code/interface.m 中，“检索图片”按钮的回调函数为：
 ```matlab
-% --- Executes on button press in searchbutton.
-function searchbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to searchbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function showbutton_Callback(hObject, eventdata, handles)
+```
+其内部调用函数 retrieve_top50.m 来从数据库中检索前 50 张最相似的图片：
+```matlab
+function [ I ] = retrieve_top50(method)
+%retrieve_top50 从数据集中检索出前五十张相似图片
+%   method：整数类型 检索方法
+%   I：cell类型 大小50x1，每个cell包含一张图片的路径
+%   
 global g_state;
-if isnan(g_state.img)
-    errordlg('您还没有选取图片！！','温馨提示');%如果没有输入，则创建错误对话框
-else
-    axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
-             handles.axes5,handles.axes6,handles.axes7,handles.axes8];
-    
-    %TODO: return images similar with g_state.img
-    I = {};
-    ...
-         
+% g_state.img 当前图片
+global g_bird_data;
+% g_bird_data.img_paths 数据库所有图片的路径
+I = {};
 end
 ```
+
+#### 待实现的检索方法：
+
+全局特征
+- [ ] YUV histogram
+- [ ] RGB histogram
+- [ ] HSV histogram
+- [ ] gray histogram
+
+
+对象区域特征
+- [ ] YUV histogram
+- [ ] RGB histogram
+- [ ] HSV histogram
+- [ ] gray histogram
+
+基于部件特征
+- [ ] ？
 

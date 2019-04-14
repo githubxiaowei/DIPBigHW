@@ -208,10 +208,10 @@ else
              handles.axes5,handles.axes6,handles.axes7,handles.axes8];
     
     %TODO: return images similar with g_state.img
-    I = {};
+    I = retrieve_top50();
     g_state.img_list = I;
-    g_state.curr_page = 1;
     g_state.total_page_num = ceil(length(I)/g_state.img_per_page);
+    g_state.curr_page = min(1,g_state.total_page_num);
     for i = 1:8
         axes(axes_list(i));
         cla;title(''); % É¾³ı±êÌâ
