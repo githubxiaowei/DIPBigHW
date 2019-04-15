@@ -21,32 +21,44 @@ http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 
  1. 将数据集 CUB_200_2011.tgz 解压到 data/ 目录下
  2. matlab 进入 code/ 目录
- 3. 先运行 prepare_feature.m，对整个数据集提取特征，结果保存在 features/ 目录下（如果该文件夹已有数据，则不必执行）
+ 3. 先运行 prepare_feature.m，对整个数据集提取特征，结果会保存在 features/ 目录下
  4. 运行 interface.m，这个脚本会打开 interface.fig 作为图形界面
 
 ## 界面
 
 * 选择类别，点击“浏览图片库”按钮，可以展示该类别下的所有图片。下方两个按钮实现翻页
 
-![show](README_img/ui1.png)
+![show](README_img/ui1.jpg)
 
 * 左侧两个按钮分别实现打开图片、检索并在右侧展示相似图片的功能
 * 在 matlab 命令行输入 guide 可以编辑图形界面
 
-![show](README_img/ui2.png)
+![show](README_img/ui2.jpg)
 
 ### TODO
-在 code/interface.m 中，“检索图片”按钮的回调函数为：
+
+添加新的计算图片特征的方式，并在 init_data_params.m 中注册：
+
 ```matlab
-function showbutton_Callback(hObject, eventdata, handles)
+%数据集特征，由 prepare_feature.m 生成特征文件
+g_bird_data.features.dir = '../features';
+%注册特征名称
+g_bird_data.features.classes = {...
+    'RGBhist',...
+    'HSVhist',...
+};
+%注册特征文件存放的路径
+g_bird_data.features.paths = {...
+    [g_bird_data.features.dir, '/feat_RGBhist.mat'],...
+    [g_bird_data.features.dir, '/feat_HSVhist.mat'],...
+};
+%注册计算特征的函数名
+g_bird_data.features.functions = {...
+    @feat_RGBhist,...
+    @feat_HSVhist,...
+};
 ```
-其内部调用函数 retrieve_top50.m 来从数据库中检索前 50 张最相似的图片：
-```matlab
-function [ I ] = retrieve_top50(method)
-%retrieve_top50 从数据集中检索出前五十张相似图片
-%   method：整数类型 检索方法
-%   I：cell类型 大小50x1，每个cell包含一张图片的路径
-```
+
 
 #### 待实现的检索方法：
 
@@ -54,15 +66,13 @@ function [ I ] = retrieve_top50(method)
 
 - [ ] YUV histogram
 - [x] RGB histogram
-- [ ] HSV histogram
-- [ ] gray histogram
+- [x] HSV histogram
 
 对象区域特征（通过目标检测、分割）
 
 - [ ] YUV histogram
 - [ ] RGB histogram
 - [ ] HSV histogram
-- [ ] gray histogram
 
 基于部件特征
 

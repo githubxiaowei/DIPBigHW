@@ -22,7 +22,7 @@ function varargout = interface(varargin)
 
 % Edit the above text to modify the response to help interface
 
-% Last Modified by GUIDE v2.5 13-Apr-2019 22:29:25
+% Last Modified by GUIDE v2.5 15-Apr-2019 20:36:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,6 +65,13 @@ guidata(hObject, handles);
 init_data_params(); %初始化数据库
 init_state_params(); %初始化程序状态
 
+axes_list = [handles.axes0,handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
+         handles.axes5,handles.axes6,handles.axes7,handles.axes8];
+for i = axes_list
+    axes(i);
+    imshow('../other_materials/white.jpg');
+end
+
 % UIWAIT makes interface wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -78,21 +85,6 @@ function varargout = interface_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
-% --- Executes on button press in showbutton.
-function showbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to showbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-bird_class = get(handles.popupmenu1, 'Value');
-global g_bird_data;
-global g_state;
-g_state.img_list = g_bird_data.img_paths([g_bird_data.start_idx(bird_class):g_bird_data.start_idx(bird_class+1)-1]);
-g_state.task = 0; %当前状态为浏览数据库
-g_state.curr_page = 1;
-g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
-refresh_axes(handles);
 
 
 % --------------------------------------------------------------------
@@ -134,19 +126,19 @@ end
 delete(handles.figure1)
 
 
-% --- Executes on selection change in popupmenu1.
-function popupmenu1_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+% --- Executes on selection change in birdclass_popupmenu.
+function birdclass_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to birdclass_popupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = get(hObject,'String') returns popupmenu1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+% Hints: contents = get(hObject,'String') returns birdclass_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from birdclass_popupmenu
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+function birdclass_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to birdclass_popupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -158,6 +150,46 @@ end
 global g_bird_data;
 set(hObject, 'String', g_bird_data.classes);
 
+
+% --- Executes on selection change in featureclass_popupmenu.
+function featureclass_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to featureclass_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns featureclass_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from featureclass_popupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function featureclass_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to featureclass_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+global g_bird_data;
+set(hObject, 'String', g_bird_data.features.classes);
+
+
+% --- Executes on button press in showbutton.
+function showbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to showbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+bird_class = get(handles.birdclass_popupmenu, 'Value');
+global g_bird_data;
+global g_state;
+g_state.img_list = g_bird_data.img_paths([g_bird_data.start_idx(bird_class):g_bird_data.start_idx(bird_class+1)-1]);
+g_state.task = 0; %当前状态为浏览数据库
+g_state.curr_page = 1;
+g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
+refresh_axes(handles);
 
 % --- Executes on button press in selectbutton.
 function selectbutton_Callback(hObject, eventdata, handles)
@@ -187,11 +219,12 @@ global g_state;
 if isnan(g_state.img)
     errordlg('您还没有选取图片！！','温馨提示');%如果没有输入，则创建错误对话框
 else
-    g_state.task = 1; %当前状态为检索图片
-    g_state.img_list = retrieve_top50(0);
+    g_state.task = get(handles.featureclass_popupmenu, 'Value'); %当前状态为检索图片,task>0
+    [g_state.img_list,time] = retrieve_top50();
     g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
     g_state.curr_page = min(1,g_state.total_page_num);
     refresh_axes(handles);
+    set(handles.timetext,'String',num2str(time));
          
 end
 
@@ -245,12 +278,10 @@ for i = 1:8
         continue;
     end
     imshow(imread(I{idx}));
-    if g_state.task == 1
+    if g_state.task > 0
         title(strcat('class:',extract_class(I{idx})));
     else
         title(num2str(idx));
     end
 end
 set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
-
-
