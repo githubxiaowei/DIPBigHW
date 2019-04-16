@@ -13,5 +13,6 @@
 
 ### 基本函数
 
-- retrie_top50.m 从数据库中检索出前 50 张最相似的图片
+- retrie_topK.m 从数据库中检索出前 K=100 张最相似的图片
 - feat_RGBhist.m 计算图片的 RGB 直方图特征
+- feat_HSVhist.m 计算图片的 HSV 直方图特征

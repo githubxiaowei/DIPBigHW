@@ -30,7 +30,8 @@ http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 
 ![show](README_img/ui1.jpg)
 
-* 左侧两个按钮分别实现打开图片、检索并在右侧展示相似图片的功能
+* 左侧两个按钮分别实现打开图片、检索并展示图片的功能
+* 用户可以通过下拉菜单选择图片的特征类型和相似度的计算方式
 * 在 matlab 命令行输入 guide 可以编辑图形界面
 
 ![show](README_img/ui2.jpg)
@@ -40,17 +41,10 @@ http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 添加新的计算图片特征的方式，并在 init_data_params.m 中注册：
 
 ```matlab
-%数据集特征，由 prepare_feature.m 生成特征文件
-g_bird_data.features.dir = '../features';
 %注册特征名称
 g_bird_data.features.classes = {...
     'RGBhist',...
     'HSVhist',...
-};
-%注册特征文件存放的路径
-g_bird_data.features.paths = {...
-    [g_bird_data.features.dir, '/feat_RGBhist.mat'],...
-    [g_bird_data.features.dir, '/feat_HSVhist.mat'],...
 };
 %注册计算特征的函数名
 g_bird_data.features.functions = {...
@@ -59,6 +53,7 @@ g_bird_data.features.functions = {...
 };
 ```
 
+注册完成后，直接运行 prepare_feature.m 即可在 features/ 目录下生成新的特征数据。
 
 #### 待实现的检索方法：
 

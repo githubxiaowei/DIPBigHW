@@ -22,7 +22,7 @@ function varargout = interface(varargin)
 
 % Edit the above text to modify the response to help interface
 
-% Last Modified by GUIDE v2.5 15-Apr-2019 20:36:40
+% Last Modified by GUIDE v2.5 16-Apr-2019 14:08:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -176,6 +176,30 @@ global g_bird_data;
 set(hObject, 'String', g_bird_data.features.classes);
 
 
+% --- Executes on selection change in similaritytype_popupmenu.
+function similaritytype_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to similaritytype_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns similaritytype_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from similaritytype_popupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function similaritytype_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to similaritytype_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+global g_bird_data;
+set(hObject, 'String', g_bird_data.features.similarity_type);
+
 % --- Executes on button press in showbutton.
 function showbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to showbutton (see GCBO)
@@ -220,7 +244,8 @@ if isnan(g_state.img)
     errordlg('您还没有选取图片！！','温馨提示');%如果没有输入，则创建错误对话框
 else
     g_state.task = get(handles.featureclass_popupmenu, 'Value'); %当前状态为检索图片,task>0
-    [g_state.img_list,time] = retrieve_top50();
+    g_state.similarity_id = get(handles.similaritytype_popupmenu, 'Value'); %选择相似度计算方式
+    [g_state.img_list,time] = retrieve_topK();
     g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
     g_state.curr_page = min(1,g_state.total_page_num);
     refresh_axes(handles);
@@ -285,3 +310,6 @@ for i = 1:8
     end
 end
 set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
+
+
+
