@@ -43,6 +43,7 @@ else
 end
 % End initialization code - DO NOT EDIT
 
+
 % --- Executes just before interface is made visible.
 function interface_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -104,12 +105,14 @@ if ~isequal(file, 0)
     open(file);
 end
 
+
 % --------------------------------------------------------------------
 function PrintMenuItem_Callback(hObject, eventdata, handles)
 % hObject    handle to PrintMenuItem (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 printdlg(handles.figure1)
+
 
 % --------------------------------------------------------------------
 function CloseMenuItem_Callback(hObject, eventdata, handles)
@@ -200,6 +203,7 @@ end
 global g_bird_data;
 set(hObject, 'String', g_bird_data.features.similarity_type);
 
+
 % --- Executes on button press in showbutton.
 function showbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to showbutton (see GCBO)
@@ -214,6 +218,7 @@ g_state.task = 0; %当前状态为浏览数据库
 g_state.curr_page = 1;
 g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
 refresh_axes(handles);
+
 
 % --- Executes on button press in selectbutton.
 function selectbutton_Callback(hObject, eventdata, handles)
@@ -232,6 +237,7 @@ axes(handles.axes0);%%使用图像，操作在坐标1
 imshow(g_state.img);%在坐标axes1显示原图像
 % title('检索图像');
 end
+
 
 % --- Executes on button press in searchbutton.
 function searchbutton_Callback(hObject, eventdata, handles)
@@ -252,7 +258,6 @@ else
     set(handles.timetext,'String',num2str(time));
          
 end
-
 
 
 % --- Executes on button press in lastpage_button.
@@ -282,14 +287,16 @@ else
     refresh_axes(handles);
 end
 
-%
+
+% ----------------------------------------------------
 function [class_str] = extract_class(path)
 %extract_class 从图片路径解析出图片类型
 pieces = split(path,'/');
 p = split(pieces(end-1),'.');
 class_str = p(1);
 
-%display imgs on 8 axes
+
+% --- display imgs on 8 axes
 function refresh_axes(handles)
 axes_list = [handles.axes1,handles.axes2,handles.axes3,handles.axes4,...
          handles.axes5,handles.axes6,handles.axes7,handles.axes8];
