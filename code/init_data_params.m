@@ -28,7 +28,7 @@ function init_data_params()
     paths = importdata([g_bird_data.data_dir,'/CUB_200_2011/images.txt']);
     g_bird_data.img_num = length(paths);
     g_bird_data.img_paths = cell(g_bird_data.img_num,1);
-    g_bird_data.start_idx = zeros(g_bird_data.classes_num,1);
+    g_bird_data.start_idx = zeros(g_bird_data.classes_num+1,1); %多一个处理边界条件
     current_class = 0;
     idx = 1;
     for i = 1:g_bird_data.img_num
@@ -42,6 +42,7 @@ function init_data_params()
         end
         idx = idx+1;
     end
+    g_bird_data.start_idx(g_bird_data.classes_num+1)=g_bird_data.img_num+1;
     
     %训练集的索引
     %g_bird_data.img_paths(g_bird_data.train_set)返回训练集
