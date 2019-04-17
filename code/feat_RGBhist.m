@@ -1,8 +1,9 @@
-function [ feature ] = feat_RGBhist( img )
+function [ feature ] = feat_RGBhist( img_path )
 %feat_RGBhist 计算图片的 RGB 颜色直方图
 %   img     输入为图片
 %   feature  输出为图片的特征向量
 
+img = imread(img_path);
 img = double(img);
 [M,N,C] = size(img);
 bin_num = 16;

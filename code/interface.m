@@ -230,11 +230,11 @@ global g_state;
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
-image=[pathname,filename];%合成路径+文件名
-g_state.img=imread(image);%读取图像
+g_state.img=[pathname,filename];%合成路径+文件名
+img = imread(g_state.img);%读取图像
 set(handles.axes0,'HandleVisibility','ON');%打开坐标，方便操作
 axes(handles.axes0);%%使用图像，操作在坐标1
-imshow(g_state.img);%在坐标axes1显示原图像
+imshow(img);%在坐标axes1显示原图像
 % title('检索图像');
 end
 

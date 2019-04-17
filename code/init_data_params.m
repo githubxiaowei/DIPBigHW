@@ -17,7 +17,7 @@ function init_data_params()
     g_bird_data.classes_num = 200;
 
     %解压后的数据文件夹
-    g_bird_data.data_dir = '../data';
+    g_bird_data.data_dir = [pwd,'/../data'];
 
     %类型列表
     d = dir([g_bird_data.data_dir,'/CUB_200_2011/images']);
@@ -35,7 +35,7 @@ function init_data_params()
         path = split(paths(i),' ');
         g_bird_data.img_paths(i) = cellstr(strcat([g_bird_data.data_dir,'/CUB_200_2011/images/'],path(2)));
         temp = split(path(2),'.');
-        temp = str2num(temp(1).char);
+        temp = str2num(temp{1}); 
         if current_class ~= temp
             current_class = temp;
             g_bird_data.start_idx(current_class) = idx;%每个类别在 img_paths 中的起始位置
@@ -56,10 +56,12 @@ function init_data_params()
     g_bird_data.features.classes = {...
         'RGBhist',...
         'HSVhist',...
+        'localRGBhist',...
         };
     g_bird_data.features.functions = {...
         @feat_RGBhist,...
         @feat_HSVhist,...
+        @feat_localRGBhist,...
         };
     
     %数据集特征文件路径

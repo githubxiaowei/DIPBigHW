@@ -1,8 +1,9 @@
-function [ feature ] = feat_HSVhist( img )
+function [ feature ] = feat_HSVhist( img_path )
 %feat_HSVhist 计算图片的 HSV 颜色直方图, 这里暂时处理为只计算 H 通道
 %   img     输入为图片
 %   feature  输出为图片的特征向量
 
+img = imread(img_path);
 img = double(img);
 [M,N,C] = size(img);
 bin_num = 16;
