@@ -1,10 +1,11 @@
-code/*.asv
+﻿code/*.asv
 code/*.jpg
 code/*.jpeg
-code/yolo/yolo_model/*
-!code/yolo/yolo_model/下载脚本.txt
+code/py_server/yolo_model/*
+!code/py_server/yolo_model/下载脚本.txt
 
 data/*
 !data/请把 CUB_200_2011.tgz 解压到这个文件夹.txt
 
-
+code/py_server/cnn_model/*.npz
+code/py_server/cnn_model/.ipynb_checkpoints
