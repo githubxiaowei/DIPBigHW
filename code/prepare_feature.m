@@ -38,22 +38,7 @@ function prepare_localRGB(feat_i)
             pos = bbox{i};
             img = imread(g_bird_data.img_paths{i});
             img = double(img(pos(2):(pos(2)+pos(4)),pos(1):(pos(1)+pos(3)),:));
-            [M,N,C] = size(img);
-            bin_num = 16;
-            if C > 1
-                R = img(:,:,1);
-                G = img(:,:,2);
-                B = img(:,:,3);
-                [rh,~] = hist(R(:),bin_num); %R_hist
-                [gh,~] = hist(G(:),bin_num); %G_hist
-                [bh,~] = hist(B(:),bin_num); %B_hsit
-                feature = [rh,gh,bh]/(M*N); %concatenation and normalization
-            else
-                gray = img(:,:,1);
-                [gyh,~] = hist(gray(:),bin_num); %gray_hist in case of gray img
-                feature = [gyh,gyh,gyh]/(M*N);
-            end
-            features{i} = feature;
+            features{i} = RGBhist(img);
             waitbar(i/g_bird_data.img_num);
         end
         close(h);
@@ -62,3 +47,20 @@ function prepare_localRGB(feat_i)
     fprintf(['done\n']);
 end
 
+function [feature] = RGBhist(img)
+    [M,N,C] = size(img);
+    bin_num = 16;
+    if C > 1
+        R = img(:,:,1);
+        G = img(:,:,2);
+        B = img(:,:,3);
+        [rh,~] = hist(R(:),bin_num); %R_hist
+        [gh,~] = hist(G(:),bin_num); %G_hist
+        [bh,~] = hist(B(:),bin_num); %B_hsit
+        feature = [rh,gh,bh]/(M*N); %concatenation and normalization
+    else
+        gray = img(:,:,1);
+        [gyh,~] = hist(gray(:),bin_num); %gray_hist in case of gray img
+        feature = [gyh,gyh,gyh]/(M*N);
+    end
+end
