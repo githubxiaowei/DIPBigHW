@@ -48,7 +48,9 @@ function init_data_params()
     %g_bird_data.img_paths(g_bird_data.train_set)返回训练集
     %g_bird_data.img_paths(~g_bird_data.train_set)返回测试集
     d = importdata([g_bird_data.data_dir,'/CUB_200_2011/train_test_split.txt']);
-    g_bird_data.train_set = logical(d(:,2));
+    g_bird_data.train_set_indices = logical(d(:,2));
+    g_bird_data.train_set = g_bird_data.img_paths(g_bird_data.train_set_indices);
+    g_bird_data.test_set = g_bird_data.img_paths(~g_bird_data.train_set_indices);
     
     %数据集特征，由 prepare_feature.m 生成特征文件
     g_bird_data.features.dir = [pwd,'/../features'];

@@ -11,10 +11,11 @@ sim_type = g_bird_data.features.similarity_type{g_state.similarity_id};%相似度计
 
 load_features = load(g_bird_data.features.paths{g_state.task});% 根据用户选择的特征
 features = cell2mat(load_features.features);
+features = features(g_bird_data.train_set_indices,:); % 训练集特征
 
 [~,Indices] = pdist2(features,f,sim_type,'smallest',K);
 
-I = g_bird_data.img_paths(Indices);
+I = g_bird_data.train_set(Indices); % 训练集中的相似图片
 
 t = toc;
 t = roundn(t,-3);
