@@ -51,7 +51,7 @@ function init_data_params()
     g_bird_data.train_set = logical(d(:,2));
     
     %数据集特征，由 prepare_feature.m 生成特征文件
-    g_bird_data.features.dir = '../features';
+    g_bird_data.features.dir = [pwd,'/../features'];
     %注册所实现的特征计算函数
     g_bird_data.features.classes = {...
         'RGBhist',...
@@ -83,5 +83,7 @@ function init_data_params()
         'chebychev',...
         'spearman',...
         };
+    
+    g_bird_data.features.yolo_bbox = [g_bird_data.features.dir,'/yolo_bbox.mat'];
 
 end
