@@ -22,7 +22,7 @@ function varargout = interface(varargin)
 
 % Edit the above text to modify the response to help interface
 
-% Last Modified by GUIDE v2.5 16-Apr-2019 14:08:26
+% Last Modified by GUIDE v2.5 07-May-2019 14:38:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -226,16 +226,26 @@ function selectbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global g_state;
-[filename,pathname]=uigetfile({'*.*';'*.bmp';'*.jpg';'*.tif';'*.jpg'},'选择图像');
-if isequal(filename,0)||isequal(pathname,0)
-    return;
+global g_bird_data;
+if get(handles.radiobutton1,'value')
+    [filename,pathname]=uigetfile({'*.*';'*.bmp';'*.jpg';'*.tif';'*.jpg'},'选择图像');
+    if isequal(filename,0)||isequal(pathname,0)
+        return;
+    else
+    g_state.img=[pathname,filename];%合成路径+文件名
+    img = imread(g_state.img);%读取图像
+    set(handles.axes0,'HandleVisibility','ON');%打开坐标，方便操作
+    axes(handles.axes0);%%使用图像，操作在坐标1
+    imshow(img);%在坐标axes1显示原图像
+    title(strcat('class:',extract_class(g_state.img)));
+    end
 else
-g_state.img=[pathname,filename];%合成路径+文件名
-img = imread(g_state.img);%读取图像
-set(handles.axes0,'HandleVisibility','ON');%打开坐标，方便操作
-axes(handles.axes0);%%使用图像，操作在坐标1
-imshow(img);%在坐标axes1显示原图像
-% title('检索图像');
+    g_state.img=g_bird_data.test_set{randi(length(g_bird_data.test_set))};%合成路径+文件名
+    img = imread(g_state.img);%读取图像
+    set(handles.axes0,'HandleVisibility','ON');%打开坐标，方便操作
+    axes(handles.axes0);%%使用图像，操作在坐标1
+    imshow(img);%在坐标axes1显示原图像
+    title(strcat('class:',extract_class(g_state.img)));
 end
 
 
@@ -317,6 +327,3 @@ for i = 1:8
     end
 end
 set(handles.pagetext,'String',[num2str(g_state.curr_page),'/',num2str(g_state.total_page_num)]);
-
-
-
