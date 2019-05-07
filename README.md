@@ -20,9 +20,10 @@ http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 ## 在matlab中运行
 
  1. 将数据集 CUB_200_2011.tgz 解压到 data/ 目录下
- 2. matlab 进入 code/ 目录
- 3. 先运行 prepare_feature.m，对整个数据集提取特征，结果会保存在 features/ 目录下
- 4. 运行 interface.m，这个脚本会打开 interface.fig 作为图形界面
+ 2. 进入 code/ 目录
+ 3. 用 python 运行 py_server 目录下的 py_server.py, 保持该程序在后台运行
+ 4. 用 matlab 运行 prepare_feature.m，对整个数据集提取特征，结果会保存在 features/ 目录下
+ 5. 运行 interface.m，这个脚本会打开 interface.fig 作为图形界面
 
 ## 界面
 
@@ -66,7 +67,7 @@ g_bird_data.features.functions = {...
 对象区域特征（通过目标检测、分割）
 
 - [ ] YUV histogram
-- [ ] RGB histogram
+- [x] RGB histogram
 - [ ] HSV histogram
 
 基于部件特征
@@ -75,4 +76,4 @@ g_bird_data.features.functions = {...
 
 基于深度学习
 
-- [ ] ？
+- [x] 
