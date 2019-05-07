@@ -37,8 +37,6 @@ end
 
 
 
-
-
 function [bbox] = select_bbox(bbox)
     if size(bbox,1) > 1
         bird_row = find(bbox(:,1)==14);
