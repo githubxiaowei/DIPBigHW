@@ -10,7 +10,7 @@ for i = 1:g_bird_data.img_num
     img_path= g_bird_data.img_paths{i};
     img = imread(img_path);
     imshow(img);
-    bbox = select_bbox(yolo_request(img_path));
+    bbox = select_bbox(py_request('B',img_path));
     if size(bbox,1)==0
         pos = [1,1,size(img,2)-1,size(img,1)-1];
     else

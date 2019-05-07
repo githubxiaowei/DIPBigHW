@@ -1,9 +1,8 @@
-function [data] = yolo_request(abs_path)
+function [data] = request(tag,abs_path)
 
 t = tcpip('localhost', 54321, 'Timeout', 30,'InputBufferSize',1024);%连接这个ip和这个端口的服务器
-
 fopen(t);
-fwrite(t,abs_path);%发送一段数据给tcp服务器。服务器好知道matlab的ip和端口
+fwrite(t,[tag,abs_path]);%发送一段数据给tcp服务器。服务器好知道matlab的ip和端口
 while(1) %轮询，直到有数据了再fread
     nBytes = get(t,'BytesAvailable');
     if nBytes>0

@@ -4,7 +4,7 @@ function [ feature ] = feat_localRGBhist( img_path )
 
 img = imread(img_path);
 
-bbox = select_bbox(yolo_request(img_path));
+bbox = select_bbox(py_request('B',img_path));
 if size(bbox,1)==0
     pos = [1,1,size(img,2)-1,size(img,1)-1];
 else

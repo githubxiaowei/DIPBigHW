@@ -6,15 +6,19 @@ K = 50;
 global g_state;
 global g_bird_data;
 tic; %开始计时
-f = g_bird_data.features.functions{g_state.task}(g_state.img);% 当前图片的特征
-sim_type = g_bird_data.features.similarity_type{g_state.similarity_id};%相似度计算方式
 
-load_features = load(g_bird_data.features.paths{g_state.task});% 根据用户选择的特征
-features = cell2mat(load_features.features);
-features = features(g_bird_data.train_set_indices,:); % 训练集特征
+if strcmp(g_bird_data.features.classes{g_state.task},'cnn')
+    Indices = py_request('L',g_state.img)
+else
+    f = g_bird_data.features.functions{g_state.task}(g_state.img);% 当前图片的特征
+    sim_type = g_bird_data.features.similarity_type{g_state.similarity_id};%相似度计算方式
 
-[~,Indices] = pdist2(features,f,sim_type,'smallest',K);
+    load_features = load(g_bird_data.features.paths{g_state.task});% 根据用户选择的特征
+    features = cell2mat(load_features.features);
+    features = features(g_bird_data.train_set_indices,:); % 训练集特征
 
+    [~,Indices] = pdist2(features,f,sim_type,'smallest',K);
+end
 I = g_bird_data.train_set(Indices); % 训练集中的相似图片
 
 t = toc;
