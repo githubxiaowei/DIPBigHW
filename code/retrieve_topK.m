@@ -8,7 +8,7 @@ global g_bird_data;
 tic; %开始计时
 
 if strcmp(g_bird_data.features.classes{g_state.task},'cnn')
-    Indices = py_request('L',g_state.img)
+    Indices = py_request('L',g_state.img);
 else
     f = g_bird_data.features.functions{g_state.task}(g_state.img);% 当前图片的特征
     sim_type = g_bird_data.features.similarity_type{g_state.similarity_id};%相似度计算方式
