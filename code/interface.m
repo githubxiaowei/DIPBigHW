@@ -238,6 +238,7 @@ if get(handles.radiobutton1,'value')
     axes(handles.axes0);%%使用图像，操作在坐标1
     imshow(img);%在坐标axes1显示原图像
     title(strcat('class:',extract_class(g_state.img)));
+    g_state.img_class = 'nan';
     end
 else
     g_state.img=g_bird_data.test_set{randi(length(g_bird_data.test_set))};%合成路径+文件名
@@ -246,6 +247,7 @@ else
     axes(handles.axes0);%%使用图像，操作在坐标1
     imshow(img);%在坐标axes1显示原图像
     title(strcat('class:',extract_class(g_state.img)));
+    g_state.img_class = extract_class(g_state.img);
 end
 
 
@@ -261,12 +263,15 @@ if isnan(g_state.img)
 else
     g_state.task = get(handles.featureclass_popupmenu, 'Value'); %当前状态为检索图片,task>0
     g_state.similarity_id = get(handles.similaritytype_popupmenu, 'Value'); %选择相似度计算方式
-    [g_state.img_list,time] = retrieve_topK();
+    [g_state.img_list,time,APs] = retrieve_topK();
     g_state.total_page_num = ceil(length(g_state.img_list)/g_state.img_per_page);
     g_state.curr_page = min(1,g_state.total_page_num);
     refresh_axes(handles);
     set(handles.timetext,'String',num2str(time));
-         
+    set(handles.AP1,'String',['AP@1:  ',num2str(roundn(100*APs(1),-2)),'%']);
+    set(handles.AP5,'String',['AP@5:  ',num2str(roundn(100*APs(2),-2)),'%']);
+    set(handles.AP10,'String',['AP@10:  ',num2str(roundn(100*APs(3),-2)),'%']);
+    set(handles.AP50,'String',['AP@50:  ',num2str(roundn(100*APs(4),-2)),'%']);
 end
 
 

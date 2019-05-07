@@ -3,6 +3,7 @@ function init_state_params()
 
 global g_state; %定义全局变量
 g_state.img = nan; %用户上传的图片
+g_state.img_class = 'nan'; %当前图片的类别
 g_state.curr_page = 0; %当前页面
 g_state.total_page_num = 0; %页面总数
 g_state.img_per_page = 8; %每页8张图片
