@@ -4,10 +4,8 @@ import numpy as np
 import os
 import socket
 import time
-import keras
-from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Conv2D, MaxPooling2D
+import tensorflow as tf
+
 
 
 class YOLO_server:
@@ -96,53 +94,46 @@ class YOLO_server:
 		text+="]"
 		return text
 
+from tensorflow.contrib.slim.nets import vgg
 
 class CNN_server:
 	def __init__(self):
 		self.num_classes = 200
+		IMAGE_SIZE = 224
 
-		# **CNN**: 3个卷积层+2个全连接层
-
-		self.model = Sequential()
-
-		self.model.add(Conv2D(32, (3, 3), padding='same', strides=2, input_shape=[64, 64, 3]))
-		self.model.add(Activation('relu'))
-		self.model.add(MaxPooling2D(pool_size=(2, 2)))
-		self.model.add(Dropout(0.25))
-
-		self.model.add(Conv2D(64, (3, 3), padding='same'))
-		self.model.add(Activation('relu'))
-		self.model.add(MaxPooling2D(pool_size=(2, 2)))
-		self.model.add(Dropout(0.25))
-
-		self.model.add(Conv2D(128, (3, 3), padding='same'))
-		self.model.add(Activation('relu'))
-		self.model.add(MaxPooling2D(pool_size=(2, 2)))
-		self.model.add(Dropout(0.25))
-
-		self.model.add(Flatten())
-
-		self.model.add(Dense(512, activation='relu', name='feat_vec'))
-
-		self.model.add(Dense(self.num_classes))
-		self.model.add(Activation('softmax'))
-
-		self.model.summary()
-
-		# initiate optimizer
-		sgd = keras.optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
-
-		# train the model using RMSprop
-		self.model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
-
-		weights_path = 'cnn_model/bird.best.hdf5'
-		self.model.load_weights(weights_path)
-
-		self.feature_model = Model(inputs=self.model.input, outputs=self.model.get_layer('feat_vec').output)
-
-		feature_vecs = np.load('cnn_model/feature_vecs.npz')
+		train_log_dir = 'cnn_model/vgg_16_2016_08_28/slim_fine_tune'
+		feature_vecs = np.load('cnn_model/vgg_feature_vecs.npz')
 		# 将训练集作为 检索库
 		self.feature_vecs_database = self.normalize(feature_vecs['train'])
+
+		assert (tf.gfile.Exists(train_log_dir) == True)
+
+		self.image_holder = tf.placeholder(tf.float32, [None, IMAGE_SIZE, IMAGE_SIZE, 3])
+		self.is_training = tf.placeholder(dtype=tf.bool)
+
+		# 创建vgg16网络  如果想冻结所有层，可以指定slim.conv2d中的 trainable=False
+		_, self.end_points = vgg.vgg_16(self.image_holder, is_training=self.is_training, num_classes=self.num_classes)
+
+		# 用于保存检查点文件
+		save = tf.train.Saver()
+
+		# 恢复模型
+		self.sess = tf.Session()
+		self.sess.run(tf.global_variables_initializer())
+
+		# 检查最近的检查点文件
+		ckpt = tf.train.latest_checkpoint(train_log_dir)
+		if ckpt != None:
+			save.restore(self.sess, ckpt)
+			print('加载上次训练保存后的模型！')
+		else:
+			assert (False)
+
+	def compute_feat(self, x):
+		layer_outputs = self.sess.run([self.end_points],
+									  feed_dict={self.image_holder: x, self.is_training: False})
+		feature = layer_outputs[0]['vgg_16/fc7'].squeeze()
+		return feature
 
 	def normalize(self, a):
 		return np.diag(1 / np.sqrt(np.sum(np.square(a), axis=1))).dot(a)  # 归一化
@@ -157,11 +148,11 @@ class CNN_server:
 		return -a.dot(b)  # 余弦距离
 
 	def retrieve(self,x, k):
-		featone = self.feature_model.predict(np.expand_dims(x, axis=0))
-		return self.topK(featone[0], self.feature_vecs_database, k)
+		featone = self.compute_feat(np.expand_dims(x, axis=0))
+		return self.topK(self.normalize(featone), self.feature_vecs_database, k)
 
 	def get_list(self, img_path):
-		img = cv2.resize(cv2.imread(img_path), (64, 64))
+		img = cv2.resize(cv2.imread(img_path), (224, 224))
 		img = np.array(img).astype('float32') / 255
 		idx_list = self.retrieve(img, 50)
 		text = "["
@@ -171,7 +162,7 @@ class CNN_server:
 		return text
 
 if __name__ == '__main__':
-	yolo_server = YOLO_server()
+	# yolo_server = YOLO_server()
 	cnn_server = CNN_server()
 	sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)  # IPV4,TCP协议
 	sock.bind(('127.0.0.1',54321))  # 绑定ip和端口，bind接受的是一个元组
