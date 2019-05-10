@@ -7,7 +7,7 @@ global g_state;
 global g_bird_data;
 tic; %开始计时
 
-if strcmp(g_bird_data.features.classes{g_state.task},'cnn')
+if strcmp(g_bird_data.features.classes{g_state.task},'vgg_feature')
     Indices = py_request('L',g_state.img);
 else
     f = g_bird_data.features.functions{g_state.task}(g_state.img);% 当前图片的特征

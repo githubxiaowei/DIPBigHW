@@ -17,7 +17,11 @@ git clone https://github.com/githubxiaowei/DIPBigHW.git
 数 据 集 下 载 链 接 （ 图 像 + 所 有 标 注 ） ：
 http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 
-## 在matlab中运行
+## 环境
+- matlab 2016b
+- python 3.6 + tensorflow 1.9.0 + keras 2.2.4 + opencv
+
+## 程序运行
 
  1. 将数据集 CUB_200_2011.tgz 解压到 data/ 目录下
  2. 进入 code/ 目录
@@ -41,7 +45,7 @@ http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz
 
 ![show](README_img/ui2.jpg)
 
-### TODO
+## TODO
 
 添加新的计算图片特征的方式，并在 init_data_params.m 中注册：
 
@@ -80,4 +84,8 @@ g_bird_data.features.functions = {...
 
 基于深度学习
 
-- [x] cnn feature
+- [x] vgg feature
+
+## 效果展示
+
+![show](README_img/show.gif)

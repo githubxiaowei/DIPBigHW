@@ -136,7 +136,7 @@ class CNN_server:
 		return feature
 
 	def normalize(self, a):
-		return np.diag(1 / np.sqrt(np.sum(np.square(a), axis=1))).dot(a)  # 归一化
+		return a / np.sqrt(np.sum(np.square(a)))  # 归一化
 
 	# 从 v_set 中找出和 v 最相似的 k 个元素
 	def topK(self, v, v_set, k):
@@ -162,7 +162,7 @@ class CNN_server:
 		return text
 
 if __name__ == '__main__':
-	# yolo_server = YOLO_server()
+	yolo_server = YOLO_server()
 	cnn_server = CNN_server()
 	sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)  # IPV4,TCP协议
 	sock.bind(('127.0.0.1',54321))  # 绑定ip和端口，bind接受的是一个元组

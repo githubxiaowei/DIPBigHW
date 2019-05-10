@@ -3,6 +3,8 @@ init_data_params()
 for i = 1:length(g_bird_data.features.classes)
     if strcmp('localRGBhist',g_bird_data.features.classes{i}) %单独处理区域特征
         prepare_localRGB(i)
+    elseif strcmp('localFGRGBhist',g_bird_data.features.classes{i}) %单独处理区域特征
+        prepare_localFGRGB(i) 
     else
         prepare(g_bird_data.features.functions{i},i);
     end
@@ -46,6 +48,28 @@ function prepare_localRGB(feat_i)
     end
     fprintf(['done\n']);
 end
+
+function prepare_localFGRGB(feat_i)
+    global g_bird_data;
+    fprintf(['\n-- preparing ',g_bird_data.features.classes{feat_i},' feature for database ...'])
+
+    if ~exist(g_bird_data.features.paths{feat_i},'file')
+        load_bbox = load(g_bird_data.features.yolo_bbox);
+        bbox = load_bbox.all_bbox;
+        features = cell(g_bird_data.img_num,1);
+        h = waitbar(0,['preparing ',g_bird_data.features.classes{feat_i},' feature for database']);
+        for i = 1:g_bird_data.img_num
+            pos = bbox{i};
+            img = imread(g_bird_data.img_paths{i});
+            features{i} = f_localFGRGBhist(img,pos);
+            waitbar(i/g_bird_data.img_num);
+        end
+        close(h);
+        save(g_bird_data.features.paths{feat_i},'features');
+    end
+    fprintf(['done\n']);
+end
+
 
 function [feature] = RGBhist(img)
     [M,N,C] = size(img);
