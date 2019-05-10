@@ -9,3 +9,5 @@ data/*
 
 code/py_server/cnn_model/*.npz
 code/py_server/cnn_model/.ipynb_checkpoints
+
+code/py_server/cnn_model/vgg_16_2016_08_28/slim_fine_tune/*
